@@ -92,3 +92,18 @@ export const formatCurrency = (amt) => {
     currency: "IDR",
   });
 };
+
+import Tesseract from 'tesseract.js';
+
+export const processReceipt = (imageFile) => {
+  return Tesseract.recognize(
+    imageFile,
+    'eng',
+    {
+      logger: (m) => console.log(m),
+    }
+  ).then(({ data: { text } }) => {
+    console.log(text);
+    return text;
+  });
+};
