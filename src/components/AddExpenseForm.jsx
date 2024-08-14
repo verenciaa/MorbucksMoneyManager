@@ -41,9 +41,8 @@ const AddExpenseForm = ({ budgets }) => {
                 const response = await ocrPredict(imageBase64);
                 console.log("OCR Response:", response);
 
-                // Function to search for total or subtotal amount
                 const findAmount = (lines) => {
-                    const totalRegex = /(TOTAL|SUBTOTAL)\s*:?\s*([\d,]+)/i; // Regex to match "TOTAL 14,000" or "SUBTOTAL: 14,000" (with optional colon)
+                    const totalRegex = /(TOTAL|SUBTOTAL)\s*:?\s*([\d,]+)/i;
                     for (let line of lines) {
                         const match = totalRegex.exec(line);
                         if (match) {
@@ -53,14 +52,12 @@ const AddExpenseForm = ({ budgets }) => {
                     return null;
                 };
 
-                // Find total or subtotal amount from OCR response
                 const amount = findAmount(response);
 
                 if (amount) {
                     formRef.current.newExpenseAmount.value = amount;
                 } else {
                     console.log("No total or subtotal found in OCR response.");
-                    // Handle case where no total or subtotal is found
                 }
             } catch (error) {
                 console.error("Error scanning receipt:", error);
@@ -72,8 +69,6 @@ const AddExpenseForm = ({ budgets }) => {
 
         reader.readAsDataURL(selectedFile);
     };
-
-
 
     return (
         <div className="form-wrapper">
@@ -146,14 +141,82 @@ const AddExpenseForm = ({ budgets }) => {
                 onRequestClose={closeModal}
                 contentLabel="Scan Receipt Modal"
                 ariaHideApp={false}
+                className="Modal"
+                overlayClassName="Overlay"
             >
                 <h2>Upload Receipt</h2>
-                <input type="file" accept="image/*" onChange={handleFileChange} />
-                <button onClick={handleScanReceipt} disabled={isScanning || !selectedFile}>
-                    {isScanning ? "Scanning..." : "Scan"}
-                </button>
-                <button onClick={closeModal}>Close</button>
+                <input type="file" accept="image/*" onChange={handleFileChange} className="file-input" />
+                <div className="modal-buttons">
+                    <button className="btn btn--dark" onClick={handleScanReceipt} disabled={isScanning || !selectedFile}>
+                        {isScanning ? "Scanning..." : "Scan"}
+                    </button>
+                    <button className="btn btn--dark" onClick={closeModal}>Close</button>
+                </div>
             </Modal>
+            <style jsx>{`
+                .form-wrapper {
+                    padding: 20px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    background: #f9f9f9;
+                }
+                .expense-inputs {
+                    display: grid;
+                    gap: 10px;
+                }
+                .grid-xs {
+                    display: grid;
+                    gap: 5px;
+                }
+                .btn--dark {
+                    background: #333;
+                    color: #fff;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                }
+                .btn--dark span {
+                    margin-right: 5px;
+                }
+                .btn--dark:disabled {
+                    background: #555;
+                    cursor: not-allowed;
+                }
+                .Modal {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    right: auto;
+                    bottom: auto;
+                    margin-right: -50%;
+                    transform: translate(-50%, -50%);
+                    background: #fff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    max-width: 500px;
+                    width: 100%;
+                }
+                .Overlay {
+                    background: rgba(0, 0, 0, 0.5);
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                }
+                .file-input {
+                    margin-top: 20px;
+                    margin-bottom: 20px;
+                }
+                .modal-buttons {
+                    display: flex;
+                    justify-content: space-between;
+                }
+            `}</style>
         </div>
     );
 };
